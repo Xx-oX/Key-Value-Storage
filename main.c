@@ -115,6 +115,17 @@ int main(int argc, char* argv[])
         exit(-1);
     }
 
+    struct sysinfo sys_info;
+    unsigned long total_ram, free_ram;    
+    if (sysinfo(&sys_info) != -1){
+        total_ram = sys_info.totalram;
+        free_ram = sys_info.freeram;
+    }
+        
+
+    printf("[SYS]Total memory size: %ld Bytes\nAvaliable memory size: %ld Bytes\n", total_ram, free_ram);
+
+
     //shell script that creates directory "./storage"
     if(vfork() == 0)
     {
