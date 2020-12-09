@@ -4,6 +4,7 @@
 FILE *ptr_out;
 Listnode *tbl_loaded;
 int is_first_line = 0;
+int MAX_BUFFER_NUM;
 
 status_t save()
 {   
@@ -33,7 +34,7 @@ status_t show_current_list()
     return OK;
 }
 
-status_t init_db(FILE *p)
+status_t init_db(FILE *p, unsigned long mem_size)
 {
     status_t ret = OK;
 
@@ -45,6 +46,8 @@ status_t init_db(FILE *p)
     
     if(ret == OK){
         tbl_loaded = NULL;
+        MAX_BUFFER_NUM = mem_size / (8192 * 168);
+        printf("[INIT]Set MAX_BUFFER_NUM to %d\n", MAX_BUFFER_NUM);
     }
     return ret;
 }

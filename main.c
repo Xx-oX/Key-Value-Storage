@@ -9,6 +9,9 @@
 /*global variables*/
 FILE *ptr_fin;
 FILE *ptr_fout;
+long long n_put = 0;
+long long n_get = 0;
+long long n_scan = 0;
 
 /*function declaration*/
 void read_input();
@@ -28,14 +31,14 @@ void read_input()
             long long ll_key = atoll(str_key);
 
             debug(api_put(ll_key, str_value));
-
+            n_put++;
         }
         else if(strcmp(instr, "GET") == 0){
             char *str_key = strtok(NULL, " ");
             long long ll_key = atoll(str_key);
 
             debug(api_get(ll_key));
-            
+            n_get++;
         }
         else if(strcmp(instr, "SCAN") == 0){
             char *str_key1 = strtok(NULL, " ");
@@ -44,7 +47,7 @@ void read_input()
             long long ll_key2 = atoll(str_key2);
 
             debug(api_scan(ll_key1, ll_key2));
-
+            n_scan++;
         }
         else{
             printf("[ERR]Input error!!!\n");
@@ -121,10 +124,7 @@ int main(int argc, char* argv[])
         total_ram = sys_info.totalram;
         free_ram = sys_info.freeram;
     }
-        
-
-    printf("[SYS]Total memory size: %ld Bytes\nAvaliable memory size: %ld Bytes\n", total_ram, free_ram);
-
+    printf("[SYS]Total memory size: %ld Bytes\n[SYS]Avaliable memory size: %ld Bytes\n", total_ram, free_ram);
 
     //shell script that creates directory "./storage"
     if(vfork() == 0)
@@ -132,15 +132,18 @@ int main(int argc, char* argv[])
         execlp("./mkdir.sh", "./mkdir.sh", "./storage", NULL);
     }
 
-    debug(init_db(ptr_fout));
+    debug(init_db(ptr_fout, free_ram));
 
+    printf("=====Start running=====\n");
     read_input();
-
+    printf("=====Saving status=====\n");
     debug(save());
 
     fclose(ptr_fout);
-    
+    printf("=======Finished========\n");
+    printf("[INFO]Put: %lld times, Get: %lld times, Scan: %lld times\n", n_put, n_get, n_scan);
+
     time_end = clock();
-    printf("Total time:%lf sec \n", (time_end - time_start)/CLOCKS_PER_SEC);
+    printf("[INFO]Total time:%lf sec \n", (time_end - time_start)/CLOCKS_PER_SEC);
     return 0;
 }

@@ -17,11 +17,11 @@
 #define SECOND_MASK_SIZE 8192           // 2^13
 /*63 = 30 + 20 + 13*/ 
 
-#define MAX_BUFFER_NUM 4096             // 168 bytes * 2^13 * 2^12 = 5376 Mb in total 
+// #define MAX_BUFFER_NUM 4096             // 168 bytes * 2^13 * 2^12 = 5376 Mb in total 
  
 status_t save();
 status_t show_current_list();
-status_t init_db(FILE *);
+status_t init_db(FILE *, unsigned long);
 status_t set_file_pointer(FILE*);
 
 status_t free_buffer(Listnode*);
