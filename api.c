@@ -213,7 +213,6 @@ status_t api_put(long long k, char *v)
         long long first = num/FIRST_MASK_SIZE;
         num %= FIRST_MASK_SIZE;
         long long second = num/SECOND_MASK_SIZE;
-        num %= SECOND_MASK_SIZE;
 
 	    char dir[MAX_PATH_SIZE];
         char path[MAX_PATH_SIZE];
@@ -268,7 +267,6 @@ status_t api_get(long long k)
         long long first = num/FIRST_MASK_SIZE;
         num %= FIRST_MASK_SIZE;
         long long second = num/SECOND_MASK_SIZE;
-        num %= SECOND_MASK_SIZE;
 
 	    char dir[MAX_PATH_SIZE];
         char path[MAX_PATH_SIZE];
@@ -330,10 +328,109 @@ status_t api_scan(long long a, long long b)
 #endif
 
     if(ret == OK){
-        for(long long i=a; i<=b ; ++i){
-            ret = api_get(i);
+        long long num, first, second, old_first, old_second;
+        Listnode *node;
+        Treenode *result;
+        for(int i=a; i<=b; ++i){
+            num = i;
+            first = num/FIRST_MASK_SIZE;
+            num %= FIRST_MASK_SIZE;
+            second = num/SECOND_MASK_SIZE;
+            
+            if(i == a){
+                // first time    
+                old_first = first;
+                old_second = second;
+                char dir[MAX_PATH_SIZE];
+                char path[MAX_PATH_SIZE];
+                sprintf(dir, "./storage/%lld/", first);
+                sprintf(path, "%s%lld.tbl", dir, second);
+                node = find_tbl(path);
+
+                if(node != NULL){
+                    result = find(node->root, i);
+                }
+                else{
+                    int loaded_num;
+                    check_list_size(&loaded_num);
+                    if(loaded_num == MAX_BUFFER_NUM){
+                        flush_list();
+                    }
+
+                    Listnode *new_tbl = malloc(sizeof(Listnode));
+                    strncpy(new_tbl->dir, dir, MAX_PATH_SIZE);
+                    strncpy(new_tbl->path, path, MAX_PATH_SIZE);
+                    new_tbl->size = 0;
+                    new_tbl->root = NULL;
+                    new_tbl->next = NULL;
+
+                    load_list(new_tbl);
+                    load_buffer(new_tbl);
+                    node = new_tbl;
+                    result = find(new_tbl->root, i);                        
+                }
+            }
+            else if(first == old_first && second == old_second){
+                if(node != NULL)
+                    result = find(node->root, i);
+                else
+                    result = NULL;
+            }
+            else{
+                old_first = first;
+                old_second = second;
+                char dir[MAX_PATH_SIZE];
+                char path[MAX_PATH_SIZE];
+                sprintf(dir, "./storage/%lld/", first);
+                sprintf(path, "%s%lld.tbl", dir, second);
+                node = find_tbl(path);
+
+                if(node != NULL){
+                    result = find(node->root, i);
+                }
+                else{
+                    // node not found
+                    if(access(path, F_OK) == 0){
+                        // file exists => need to load
+                        int loaded_num;
+                        check_list_size(&loaded_num);
+                        if(loaded_num == MAX_BUFFER_NUM){
+                            flush_list();
+                        }
+
+                        Listnode *new_tbl = malloc(sizeof(Listnode));
+                        strncpy(new_tbl->dir, dir, MAX_PATH_SIZE);
+                        strncpy(new_tbl->path, path, MAX_PATH_SIZE);
+                        new_tbl->size = 0;
+                        new_tbl->root = NULL;
+                        new_tbl->next = NULL;
+
+                        load_list(new_tbl);
+                        load_buffer(new_tbl);
+                        node = new_tbl;
+                        result = find(new_tbl->root, i);
+                    }
+                    else{
+                        // file don't exists => EMPTY
+                        node = NULL;
+                        result = NULL;
+                    }                       
+                }
+            }
+            // output
+            if(is_first_line == 0){
+                is_first_line = 1;
+            }
+            else{
+                fwrite("\n", 1, 1, ptr_out);
+            }
+            if(result == NULL){
+                fwrite("EMPTY", sizeof(char) * 5, 1, ptr_out);
+            }
+            else{
+                fwrite(result->value, sizeof(char)*VALUE_LEN, 1, ptr_out);
+            }
         }
     }
     return ret;
 }
-
