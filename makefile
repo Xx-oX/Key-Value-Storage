@@ -21,7 +21,7 @@ unordered: unordered.cpp
 	g++ $(gdb) $(optimal) $(warning) -o unordered unordered.cpp
 
 clean:
-	rm -f main *.o *.output -r ${dir_name}/
+	rm -f main generate unordered *.o *.output -r ${dir_name}/
 
 clroutput:
 	rm -f *.output -r ${dir_name}/
