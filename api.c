@@ -334,7 +334,7 @@ status_t api_scan(long long a, long long b)
         long long num, first, second, old_first, old_second;
         Listnode *node;
         Treenode *result;
-        for(int i=a; i<=b; ++i){
+        for(long long i=a; i<=b; ++i){
             num = i;
             first = num/FIRST_MASK_SIZE;
             num %= FIRST_MASK_SIZE;
