@@ -184,7 +184,7 @@ status_t flush_list()
 
 status_t load_list(Listnode* tbl_in)
 {
-    // need to ensure that len(tbl_loaded<MAX_BUFFER_NUM)
+    /*[ATTN]Need to ensure that len(tbl_loaded<MAX_BUFFER_NUM)*/
     Listnode *curr = tbl_loaded;
     Listnode *prev = NULL;
     while(curr != NULL){
