@@ -92,14 +92,8 @@ status_t flush_buffer(Listnode *node)
         // create directory if directory does not exists
         mkdir(node->dir, S_IRUSR | S_IWUSR | S_IXUSR);
     }
-
-
-    if(vfork() == 0)
-    {
-        execlp("./mkfile.sh", "./mkfile.sh", node->dir, node->path, NULL);
-    }
-
-    FILE *ptr_f = fopen(node->path, "w");
+    
+    FILE *ptr_f = fopen(node->path, "w+");
     if(ptr_f == NULL) return ERR_FILE;
 
     status_t ret = recur_flush(ptr_f, node->root);
@@ -133,22 +127,24 @@ status_t load_buffer(Listnode *node)
     /*[ATTN]Memory of node should be allocated*/
     status_t ret = OK;
 
-    if(vfork() == 0)
-    {
-        execlp("./mkfile.sh", "./mkfile.sh", node->dir, node->path, NULL);
+    if(access(node->dir, F_OK) != 0){
+        // create directory if directory does not exists
+        mkdir(node->dir, S_IRUSR | S_IWUSR | S_IXUSR);
     }
 
-    FILE *ptr_f = fopen(node->path, "r");
-    if(ptr_f == NULL) return ERR_FILE;
+    if(access(node->path, F_OK) == 0){
+        FILE *ptr_f = fopen(node->path, "r");
+        if(ptr_f == NULL) return ERR_FILE;
 
-    long long k;
-    char v[VALUE_LEN];
-    while(fscanf(ptr_f, "%lld:%s\n", &k, v) != EOF){
-        insert_unique(&(node->root), k, v);
-        node->size++;
+        long long k;
+        char v[VALUE_LEN];
+        while(fscanf(ptr_f, "%lld:%s\n", &k, v) != EOF){
+            insert_unique(&(node->root), k, v);
+            node->size++;
+        }
+        fclose(ptr_f);
     }
-
-    fclose(ptr_f);
+    
     return ret;
 }
 

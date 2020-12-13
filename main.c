@@ -126,10 +126,8 @@ int main(int argc, char* argv[])
     }
     printf("[SYS]Total memory size: %ld Bytes\n[SYS]Avaliable memory size: %ld Bytes\n", total_ram, free_ram);
 
-    //shell script that creates directory "./storage"
-    if(vfork() == 0)
-    {
-        execlp("./mkdir.sh", "./mkdir.sh", "./storage", NULL);
+    if(access("./storage", F_OK) != 0){
+        mkdir("./storage", S_IRUSR | S_IWUSR | S_IXUSR);
     }
 
     debug(init_db(ptr_fout, free_ram));
