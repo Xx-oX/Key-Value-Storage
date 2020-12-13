@@ -88,6 +88,12 @@ status_t flush_buffer(Listnode *node)
 {
     if(node == NULL) return OK;
 
+    if(access(node->dir, F_OK) != 0){
+        // create directory if directory does not exists
+        mkdir(node->dir, S_IRUSR | S_IWUSR | S_IXUSR);
+    }
+
+
     if(vfork() == 0)
     {
         execlp("./mkfile.sh", "./mkfile.sh", node->dir, node->path, NULL);
