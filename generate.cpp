@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     std::mt19937 rg( time(NULL) );
     std::uniform_int_distribution<long long> r_key;
     std::uniform_int_distribution<int> r_instr(0,100);
-    std::uniform_int_distribution<int> r_scan_range(0,10000);
+    std::uniform_int_distribution<int> r_scan_range(0,1000);
 
     long long size = 0;
     if(argc > 1){
@@ -53,17 +53,17 @@ int main(int argc, char *argv[])
         
         int a = r_instr(rg);
 
-        if (a < 2) {
+        if (a < 1) {
             string instr = "SCAN ";
             long long key1 = r_key(rg);
             long long key2 = key1 + r_scan_range(rg);
             f_out << instr << key1 << " " << key2 << "\n";
         }
-        else if(a < 20) {
+        else if(a < 15) {
             string instr = "GET ";
             int x = r_instr(rg);
             long long key;
-            if(!used.empty() && x > 60){
+            if(!used.empty() && x > 10){
                 std::uniform_int_distribution<int> r_index(0,used.size()-1);
                 key = used.at(r_index(rg));
             }
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
             string instr = "PUT ";
             int x = r_instr(rg);
             long long key;
-            if(!used.empty() && x > 60){
+            if(!used.empty() && x > 10){
                 std::uniform_int_distribution<int> r_index(0,used.size()-1);
                 key = used.at(r_index(rg));
             }

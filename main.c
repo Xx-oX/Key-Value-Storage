@@ -122,9 +122,10 @@ int main(int argc, char* argv[])
     unsigned long total_ram, free_ram;    
     if (sysinfo(&sys_info) != -1){
         total_ram = sys_info.totalram;
-        free_ram = sys_info.freeram;
+        free_ram = sys_info.freeram + sys_info.bufferram + sys_info.freeswap;
     }
-    printf("[SYS]Total memory size: %ld Bytes\n[SYS]Avaliable memory size: %ld Bytes\n", total_ram, free_ram);
+    printf("[SYS]Total memory size: %ld Bytes\n", total_ram);
+    printf("[SYS]Avaliable memory size: %ld Bytes = %ld + %ld + %ld\n", free_ram, sys_info.freeram, sys_info.bufferram, sys_info.freeswap);
 
     if(access("./storage", F_OK) != 0){
         mkdir("./storage", S_IRUSR | S_IWUSR | S_IXUSR);
